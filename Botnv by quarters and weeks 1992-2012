@@ -75,9 +75,15 @@ botnvWp <- botnv %>% group_by(year, week) %>%
 plot(botnvWp)
 plotweek <- gather(botnvWp, key = species, value = catch, cod, haddock, saithe) 
 ggplot(data= plotweek, aes( x= week,  y=catch,  haddock, saithe, cod, color=species ))+
-  geom_line()      
+  geom_line()    
   
-# for week, usig 53 weeks per year
+  
+#Correlation test
+cor.test(botnvWp$haddock, botnvWp$saithe, method="pearson")
+cor.test(botnvWp$haddock, botnvWp$cod, method="pearson")
+cor.test(botnvWp$saithe, botnvWp$cod, method="pearson")
+  
+# other way for week, usig 53 weeks per year
 dates <- as.POSIXlt(as.Date(botnv$date))
 yday <- unclass(dates)$yday
 botnv$yday <- yday
@@ -89,7 +95,3 @@ botnvW <- botnv %>% group_by(year, weeks) %>%
             haddock = sum(haddock),
             saithe = sum(saithe))
 
-#Correlation test
-cor.test(botnvW$haddock, botnvW$saithe, method="pearson")
-cor.test(botnvW$haddock, botnvW$cod, method="pearson")
-cor.test(botnvW$saithe, botnvW$cod, method="pearson")
