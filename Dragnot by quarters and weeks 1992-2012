@@ -1,0 +1,95 @@
+### Dragnot by quarters and weeks 1992-2012
+
+# Dragnot with all the catch species in the gear botnv.
+#values for create the data by quartes 1992-2012
+dragnot<- translate.dragnot()
+dragnot<- select(dragnot, landing.day, landing.month, year, gray.sole, halibut, whiting, common.dab, plaice, skates, monkfish, rough.dab, catfish, megrim, cod, lemon.sole, saithe, haddock)
+dragnot <- filter(dragnot, year>=1992 & year<=2012) # filter of years 1992-2012 
+dragnot <- arrange(dragnot,  year, landing.month, landing.day) # arrange, reordered by day, month and year.
+dragnot <- unite(dragnot, date, 
+               year, landing.month, landing.day, 
+               sep='-', remove=F)
+dragnot$date <- as.Date(dragnot$date)
+dragnot$quarters <- as.Date(cut(dragnot$date, breaks='quarters'))
+dragnotqp <- dragnot%>% group_by(quarters) %>% 
+  summarize(gray.sole = sum(gray.sole),
+            halibut = sum(halibut),
+            whiting = sum(whiting),
+            common.dab = sum(common.dab),
+            plaice = sum(plaice),
+            skates = sum(skates),
+            monkfish = sum(monkfish),
+            rough.dab= sum(rough.dab),
+            catfish = sum(catfish),
+            megrim= sum(megrim),
+            cod = sum(cod),
+            lemon.sole = sum(lemon.sole),
+            saithe = sum(saithe),
+            haddock = sum(haddock))
+            
+
+# Plot of the catchs in dragnot with all the species, quarters 1992-2012
+dragnotplotq<- gather(dragnotqp, key = species, value = catch, gray.sole, halibut, whiting, common.dab, plaice, skates, monkfish, rough.dab, catfish, megrim, cod, lemon.sole, saithe, haddock) 
+ggplot(data= dragnotplotq, aes( x= quarters,  y=catch, gray.sole, halibut, whiting, common.dab, plaice, skates, monkfish, rough.dab, catfish, megrim, cod, lemon.sole, saithe, haddock, color=species ))+
+  geom_line()
+
+# second plot with the principal species
+dragnot5S<-select(dragnotqp, cod, haddock, common.dab, catfish, lemon.sole)
+dplot<- gather(dragnotqp, key = species, value = catch, cod, haddock, common.dab, catfish, lemon.sole) 
+ggplot(data= dplot, aes( x= quarters,  y=catch, cod, haddock, common.dab, catfish, lemon.sole, color=species ))+
+  geom_line()
+
+# The pricipal catch specie is cod, but two otheres species are important haddock a saihe.
+The second plot is with the 3 representative species, in the case of haddock and saithe the chart shows that species have correlation between them but not with cod, for a better interpretation of the results is necesary review the correlations.
+
+#Correlations
+# correlation using all the species
+corre<- select(dragnotqp, gray.sole, halibut, whiting, common.dab, plaice, skates, monkfish, rough.dab, catfish, megrim, cod, lemon.sole, saithe, haddock)
+cor(corre)
+
+#usin 5 species for look the correlation
+cor(dragnot5S)
+
+# plot with the 5 species
+plot(dragnot5S)
+
+# specific species
+cor.test(dragnot5S$catfish, dragnot5S$lemon.sole, method="pearson")
+cor.test(dragnot5S$haddock, dragnot5S$common.dab, method="pearson")
+cor.test(dragnot5S$haddock, dragnot5S$cod, method="pearson")
+
+#R script for botnv by weeks
+# script for week especially for plot:
+#values from 1 to 365 days, divided for weeks in a year
+dragnot$week <- as.Date(cut(dragnot$date, breaks='week'))
+dragnotWp <- dragnot %>% group_by(year, week) %>% 
+  summarize(common.dab = sum(common.dab),
+            catfish = sum(catfish),
+            cod = sum(cod),
+            lemon.sole = sum(lemon.sole),
+            haddock = sum(haddock))
+            
+plotweek <- gather(dragnotWp, key = species, value = catch, cod, haddock, common.dab, catfish, lemon.sole) 
+ggplot(data= plotweek, aes( x= week,  y=catch,  cod, haddock, common.dab, catfish, lemon.sole, color=species ))+
+  geom_line()      
+  
+#Correlation test
+cor.test(dragnotWp$catfish, dragnotWp$lemon.sole, method="pearson")
+cor.test(dragnotWp$haddock, dragnotWp$common.dab, method="pearson")
+cor.test(dragnotWp$haddock, dragnotWp$cod, method="pearson")
+
+
+# other way for look by week and year
+# for week, usig 53 weeks per year 
+dates <- as.POSIXlt(as.Date(dragnot$date))
+yday <- unclass(dates)$yday
+dragnot$yday <- yday
+dragnot<- mutate(dragnot, weeks = ceiling(yday / 7))
+dragnot$date <- as.Date(dragnot$yday)
+dragnot$week <- as.Date(cut(dragnot$yday, breaks='weeks'))
+dragnotW <- dragnot %>% group_by(year, weeks) %>% 
+ summarize(common.dab = sum(common.dab),
+            catfish = sum(catfish),
+            cod = sum(cod),
+            lemon.sole = sum(lemon.sole),
+            haddock = sum(haddock))
