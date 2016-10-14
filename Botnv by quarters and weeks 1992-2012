@@ -35,8 +35,8 @@ botnvQp <- botnv %>% group_by(quarters) %>%
             haddock = sum(haddock))
 
 # Plot of the catchs in botnv with all the species, quarters 1992-2012
-
 botnvplotq<- gather(botnvQp, key = species, value = catch, dab, deep.redfish, flatfish , greenland.halibut, gr.silver.smelt, spotted.catfish, redfish, tusk, blue.whiting, ling, halibut, plaice, monkfish, rough.dab, catfish, cod, lemon.sole, saithe, haddock) # gather for creat grups
+
 ggplot(data= botnvplotq, aes( x= quarters,  y=catch, dab, deep.redfish, flatfish , greenland.halibut, gr.silver.smelt, spotted.catfish, redfish, tusk, blue.whiting, ling, halibut, plaice, monkfish, rough.dab, catfish, cod, lemon.sole, saithe, haddock, color=species ))+
   geom_line()
 
@@ -68,19 +68,16 @@ plot(botnv3c)
 #R script for botnv by weeks
 # script for week especially for plot:
 #values from 1 to 365 days, divided for weeks in a year
-botnv <- unite(botnv, date, year, landing.month, landing.day, sep='-', remove=F)
-botnv$date <- as.Date(botnv$date)
 botnv$week <- as.Date(cut(botnv$date, breaks='week'))
 botnvWp <- botnv %>% group_by(year, week) %>% 
   summarize(cod = sum(cod),
             haddock = sum(haddock),
             saithe = sum(saithe))
 plot(botnvWp)
-plotweek <- gather(botnWp, key = species, value = catch, cod, haddock, saithe) 
+plotweek <- gather(botnvWp, key = species, value = catch, cod, haddock, saithe) 
 ggplot(data= plotweek, aes( x= week,  y=catch,  haddock, saithe, cod, color=species ))+
-  geom_line()            
-
-
+  geom_line()      
+  
 # for week, usig 53 weeks per year
 dates <- as.POSIXlt(as.Date(botnv$date))
 yday <- unclass(dates)$yday
@@ -93,6 +90,7 @@ botnvW <- botnv %>% group_by(year, weeks) %>%
             haddock = sum(haddock),
             saithe = sum(saithe))
 
+#Correlation test
 cor.test(botnvW$haddock, botnvW$saithe, method="pearson")
 cor.test(botnvW$haddock, botnvW$cod, method="pearson")
 cor.test(botnvW$saithe, botnvW$cod, method="pearson")
