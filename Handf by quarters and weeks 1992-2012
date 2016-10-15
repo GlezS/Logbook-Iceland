@@ -1,0 +1,56 @@
+### Handf by quarters and weeks 1992-2012
+
+# Handf with all the catch species in the gear botnv.
+handf<- translate.handf()
+handf<- select(hand, landing.day, landing.month, year, catfish,cod, saithe, haddock) #selection of variables for reduce the database
+handf <- filter(handf, year>=1992 & year<=2012) # filter of years 1992-2012 
+handf <- arrange(handf,  year, landing.month, landing.day) # arrange, reordered by day, month and year
+
+#values for create the data by quartes 1992-2012,
+handf <- unite(handf, date, 
+                 year, landing.month, landing.day, 
+                 sep='-', remove=F)
+handf$date <- as.Date(handf$date)
+handf$quarters <- as.Date(cut(handf$date, breaks='quarters'))
+handfqp <- handf%>% group_by(quarters) %>% 
+  summarize( catfish = sum(catfish),
+             cod = sum(cod),
+             saithe = sum(saithe),
+            haddock = sum(haddock))
+            
+# Plot of the catchs in handf with all the species, quarters 1992-2012
+handfplotq<- gather(handfqp, key = species, value = catch, catfish,cod, saithe, haddock) # gather for creat grups
+ggplot(data= handfplotq, aes( x= quarters,  y=catch, catfish,cod, saithe, haddock, color=species ))+
+  geom_line() 
+
+#Correlations
+# correlation using all the species
+corre<- select(handfqp, catfish,cod, saithe, haddock)
+cor(corre)
+
+# test correlation for specific species
+cor.test(handfqp$haddock, handfqp$saithe, method="pearson")
+cor.test(handfqp$haddock, handfqp$cod, method="pearson")
+cor.test(handfqp$saithe, handfqp$cod, method="pearson")
+
+# plot with the 4 species
+plot(corre)
+
+#R script for handf by weeks
+# script for week especially for plot:
+#values from 1 to 365 days, divided for weeks in a year
+handf$week <- as.Date(cut(handf$date, breaks='week'))
+handfWp <- handf %>% group_by(year, week) %>% 
+  summarize( catfish = sum(catfish),
+             cod = sum(cod),
+             saithe = sum(saithe),
+            haddock = sum(haddock))
+plot(handfWp)
+plotweek <- gather(handfWp, key = species, value = catch, catfish,cod, saithe, haddock) 
+ggplot(data= plotweek, aes( x= week,  y=catch, catfish,cod, saithe, haddock, color=species ))+
+  geom_line()    
+
+#Correlation test
+cor.test(handfWp$haddock, handfWp$saithe, method="pearson")
+cor.test(handfWp$haddock, handfWp$cod, method="pearson")
+cor.test(handfWp$saithe, handfWp$cod, method="pearson")
