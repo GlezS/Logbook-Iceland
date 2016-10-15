@@ -39,9 +39,6 @@ dplot<- gather(dragnotqp, key = species, value = catch, cod, haddock, common.dab
 ggplot(data= dplot, aes( x= quarters,  y=catch, cod, haddock, common.dab, catfish, lemon.sole, color=species ))+
   geom_line()
 
-# The pricipal catch specie is cod, but two otheres species are important haddock a saihe.
-The second plot is with the 3 representative species, in the case of haddock and saithe the chart shows that species have correlation between them but not with cod, for a better interpretation of the results is necesary review the correlations.
-
 #Correlations
 # correlation using all the species
 corre<- select(dragnotqp, gray.sole, halibut, whiting, common.dab, plaice, skates, monkfish, rough.dab, catfish, megrim, cod, lemon.sole, saithe, haddock)
