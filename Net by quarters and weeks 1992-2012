@@ -1,0 +1,83 @@
+### Net by quarters and weeks 1992-2012
+
+#with all the catch species in the gear net.
+net<- translate.net()
+net<- select(net, landing.day, landing.month, year, greenland.halibut, redfish, tusk, ling, whiting, plaice, monkfish, wolffish,  cod, saithe, haddock)
+net <- filter(net, year>=1992 & year<=2012) # filter of years 1992-2012 
+net <- arrange(net,  year, landing.month, landing.day) # arrange, reordered by day, month and year.
+
+#values for create the data by quartes 1992-2012,
+net <- unite(net, date, 
+              year, landing.month, landing.day, 
+              sep='-', remove=F)
+net$date <- as.Date(net$date)
+net$quarters <- as.Date(cut(net$date, breaks='quarters'))
+netqp <- net%>% group_by(quarters) %>% 
+  summarize( greenland.halibut = sum(greenland.halibut),
+             redfish = sum(redfish),
+             tusk = sum(tusk),
+             ling = sum(ling),
+             whiting = sum(whiting),
+             plaice = sum(plaice),
+             monkfish = sum(monkfish),
+             wolffish = sum(wolffish),
+             cod = sum(cod),
+             saithe = sum(saithe),
+             haddock = sum(haddock))
+            
+# Plot of the catchs in nets with all the species, quarters 1992-2012
+
+netplotq<- gather(netqp, key = species, value = catch, greenland.halibut, redfish, tusk, ling, whiting, plaice, monkfish, wolffish,  cod, saithe, haddock) 
+ggplot(data= netplotq, aes( x= quarters,  y=catch, greenland.halibut, redfish, tusk, ling, whiting, plaice, monkfish, wolffish,  cod, saithe, haddock, color=species ))+
+  geom_line()
+  
+#plot with 3 species
+netplotqs<- gather(netqp, key = species, value = catch,  cod,  haddock, monkfish, saithe) 
+ggplot(data= netplotqs, aes( x= quarters,  y=catch,  cod,  haddock, monkfish, saithe, color=species ))+
+  geom_line()
+
+#Correlations
+#correlation using all the species
+corre<- select(netqp, greenland.halibut, redfish, tusk, ling, whiting, plaice, monkfish, wolffish,  cod, saithe, haddock)
+cor(corre)
+
+# plot with the 3 species
+cor<- select(netqp, cod,  haddock, monkfish, saithe)# with 4 species 
+plot(cor)
+
+# test correlation for specific species
+cor.test(netqp$haddock, netqp$cod , method="pearson")
+cor.test(netqp$monkfish, netqp$cod , method="pearson")
+cor.test(netqp$saithe, netqp$cod , method="pearson")
+
+#R script for handf by weeks
+# script for week especially for plot:
+#values from 1 to 365 days, divided for weeks in a year
+net$week <- as.Date(cut(net$date, breaks='week'))
+netWp <- net %>% group_by(year, week) %>% 
+   summarize( greenland.halibut = sum(greenland.halibut),
+             redfish = sum(redfish),
+             tusk = sum(tusk),
+             ling = sum(ling),
+             whiting = sum(whiting),
+             plaice = sum(plaice),
+             monkfish = sum(monkfish),
+             wolffish = sum(wolffish),
+             cod = sum(cod),
+             saithe = sum(saithe),
+             haddock = sum(haddock))
+
+#plot by week
+plotweek <- gather(netWp, key = species, value = catch, greenland.halibut, redfish, tusk, ling, whiting, plaice, monkfish, wolffish,  cod, saithe, haddock)
+ggplot(data= plotweek, aes( x= week,  y=catch, greenland.halibut, redfish, tusk, ling, whiting, plaice, monkfish, wolffish,  cod, saithe, haddock, color=species ))+
+  geom_line() 
+
+#plot with 3 species by week
+netplotWs<- gather(netWp, key = species, value = catch, cod,  haddock, monkfish, saithe) 
+ggplot(data= netplotWs, aes( x=week,  y=catch, ccod,  haddock, monkfish, saithe, color=species ))+
+ geom_line()
+
+#Correlation test
+cor.test(netWp$haddock, netWp$cod , method="pearson")
+cor.test(netWp$monkfish, netWp$cod , method="pearson")
+cor.test(netWp$saithe, netWp$cod , method="pearson")
