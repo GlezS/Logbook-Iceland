@@ -18,7 +18,7 @@ raekjaqp <- raekja%>% group_by(quarters) %>%
              shrimp = sum(shrimp),
              cod = sum(cod))
             
-# Plot of the catchs in nets with all the species, quarters 1992-2012
+# Plot of the catchs in raekja with all the species, quarters 1992-2012
 raekjaplotq<- gather(raekjaqp, key = species, value = catch, greenland.halibut, redfish, shrimp,  cod) 
 ggplot(data= raekjaplotq, aes( x= quarters,  y=catch, greenland.halibut, redfish, shrimp,  cod, color=species ))+
   geom_line()
@@ -27,7 +27,7 @@ ggplot(data= raekjaplotq, aes( x= quarters,  y=catch, greenland.halibut, redfish
 #correlation using all the species
 corr<- select(raekjaqp, greenland.halibut, redfish, shrimp, cod)
 cor(corr)
-# plot with the 3 species
+# plot with all species
 plot(corr)
 
 # test correlation for specific species
@@ -35,7 +35,7 @@ cor.test(raekjaqp$cod, raekjaqp$shrimp , method="pearson")
 cor.test(raekjaqp$redfish, raekjaqp$shrimp , method="pearson")
 cor.test(raekjaqp$redfish, raekjaqp$cod , method="pearson")
 
-#R script for handf by weeks
+#R script for raekja by weeks
 # script for week especially for plot:
 #values from 1 to 365 days, divided for weeks in a year
 raekja$week <- as.Date(cut(raekja$date, breaks='week'))
