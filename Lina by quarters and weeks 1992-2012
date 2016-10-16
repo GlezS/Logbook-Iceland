@@ -1,0 +1,94 @@
+### Lina by quarters and weeks 1992-2012
+
+#with all the catch species in the gear lina.
+lina<- translate.lina()
+lina<- select(lina, landing.day, landing.month, year, dab, flatfish, greenland.halibut, spotted.catfish, redfish, tusk, ling, halibut, whiting, plaice, skates, monkfish, catfish, starry.ray, cod, saithe, haddock)
+lina <- filter(lina, year>=1992 & year<=2012) # filter of years 1992-2012 
+lina <- arrange(lina,  year, landing.month, landing.day) # arrange, reordered by day, month and year.
+
+#values for create the data by quartes 1992-2012,
+lina <- unite(lina, date, 
+               year, landing.month, landing.day, 
+               sep='-', remove=F)
+lina$date <- as.Date(lina$date)
+lina$quarters <- as.Date(cut(lina$date, breaks='quarters'))
+linaqp <- lina%>% group_by(quarters) %>% 
+  summarize( dab = sum(dab),
+             flatfish = sum(flatfish),
+             greenland.halibut = sum(greenland.halibut),
+             spotted.catfish = sum(spotted.catfish),
+             redfish = sum(redfish),
+             tusk = sum(tusk),
+             ling = sum(ling),
+             halibut = sum(halibut),
+             whiting = sum(whiting),
+             plaice = sum(plaice),
+             skates = sum(skates),
+             monkfish = sum(monkfish),
+             catfish= sum(catfish),
+             starry.ray = sum(starry.ray),
+             cod = sum(cod),
+             saithe = sum(saithe),
+             haddock = sum(haddock))
+            
+# Plot of the catchs in lina with all the species, quarters 1992-2012
+linaplotq<- gather(linaqp, key = species, value = catch, dab, flatfish, greenland.halibut, spotted.catfish, redfish, tusk, ling, halibut, whiting, plaice, skates, monkfish, catfish, starry.ray, cod, saithe, haddock) 
+ggplot(data= linaplotq, aes( x= quarters,  y=catch, dab, flatfish, greenland.halibut, spotted.catfish, redfish, tusk, ling, halibut, whiting, plaice, skates, monkfish, catfish, starry.ray, cod, saithe, haddock, color=species ))+
+  geom_line()
+
+#plot with 3 species
+linaplotqs<- gather(linaqp, key = species, value = catch, catfish, cod,  haddock) 
+ggplot(data= linaplotqs, aes( x= quarters,  y=catch, catfish , cod,   haddock, color=species ))+
+  geom_line()
+
+#Correlations
+#correlation using all the species
+corre<- select(linaqp, dab, flatfish, greenland.halibut, spotted.catfish, redfish, tusk, ling, halibut, whiting, plaice, skates, monkfish, catfish, starry.ray, cod, saithe, haddock)
+cor(corre)
+
+# test correlation for specific species
+cor.test(linaqp$haddock, linaqp$cod , method="pearson")
+cor.test(linaqp$catfish, linaqp$cod , method="pearson")
+cor.test(linaqp$haddock, linaqp$catfish , method="pearson")
+
+# plot with the 3vspecies
+cor<-select(linaqp, cod, haddock, catfish)
+plot(cor)
+
+#R script for handf by weeks
+# script for week especially for plot:
+#values from 1 to 365 days, divided for weeks in a year
+lina$week <- as.Date(cut(lina$date, breaks='week'))
+linaWp <- lina %>% group_by(year, week) %>% 
+  summarize( dab = sum(dab),
+             flatfish = sum(flatfish),
+             greenland.halibut = sum(greenland.halibut),
+             spotted.catfish = sum(spotted.catfish),
+             redfish = sum(redfish),
+             tusk = sum(tusk),
+             ling = sum(ling),
+             halibut = sum(halibut),
+             whiting = sum(whiting),
+             plaice = sum(plaice),
+             skates = sum(skates),
+             monkfish = sum(monkfish),
+             catfish= sum(catfish),
+             starry.ray = sum(starry.ray),
+             cod = sum(cod),
+             saithe = sum(saithe),
+             haddock = sum(haddock))
+
+#plot by week
+plotweek <- gather(linaWp, key = species, value = catch,  dab, flatfish, greenland.halibut, spotted.catfish, redfish, tusk, ling, halibut, whiting, plaice, skates, monkfish, catfish, starry.ray, cod, saithe, haddock) 
+ggplot(data= plotweek, aes( x= week,  y=catch,  dab, flatfish, greenland.halibut, spotted.catfish, redfish, tusk, ling, halibut, whiting, plaice, skates, monkfish, catfish, starry.ray, cod, saithe, haddock, color=species ))+
+  geom_line() 
+
+#plot with 3 species by week
+linaplotWs<- gather(linaWp, key = species, value = catch, catfish, cod,  haddock) 
+ggplot(data= linaplotWs, aes( x=week,  y=catch, catfish , cod,   haddock, color=species ))+
+ geom_line()
+
+#Correlation test
+cor.test(linaWp$haddock, linaWp$cod , method="pearson")
+cor.test(linaWp$catfish, linaWp$cod , method="pearson")
+cor.test(linaWp$haddock, linaWp$catfish , method="pearson")
