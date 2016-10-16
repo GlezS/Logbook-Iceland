@@ -50,7 +50,7 @@ cor.test(netqp$haddock, netqp$cod , method="pearson")
 cor.test(netqp$monkfish, netqp$cod , method="pearson")
 cor.test(netqp$saithe, netqp$cod , method="pearson")
 
-#R script for handf by weeks
+#R script for net by weeks
 # script for week especially for plot:
 #values from 1 to 365 days, divided for weeks in a year
 net$week <- as.Date(cut(net$date, breaks='week'))
