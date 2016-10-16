@@ -1,6 +1,6 @@
 ### Humar by quarters and weeks 1992-2012
 
-# Humar with all the catch species in the gear botnv.
+# With all the catch species in the gear Humar .
 humar<- translate.humar()
 humar<- select(humar, landing.day, landing.month, year, nephrops, redfish, gray.sole, monkfish, cod, haddock)
 humar <- filter(humar, year>=1992 & year<=2012) # filter of years 1992-2012 
