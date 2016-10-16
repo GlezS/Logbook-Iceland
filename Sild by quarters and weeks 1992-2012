@@ -1,0 +1,48 @@
+### Sild by quarters and weeks 1992-2012
+
+#with all the catch species in the gear raekja.
+sild<- translate.sild()
+sild<- select(sild, landing.day, landing.month, year, norwegian.herring, herring )
+sild <- filter(sild, year>=1992 & year<=2012) # filter of years 1992-2012 
+sild <- arrange(sild,  year, landing.month, landing.day) # arrange, reordered by day, month and year.
+
+#values for create the data by quartes 1992-2012,
+sild <- unite(sild, date, 
+              year, landing.month, landing.day, 
+              sep='-', remove=F)
+sild$date <- as.Date(sild$date)
+sild$quarters <- as.Date(cut(sild$date, breaks='quarters'))
+sildqp <- sild%>% group_by(quarters) %>% 
+  summarize( norwegian.herring = sum(norwegian.herring),
+             herring = sum(herring))
+            
+# Plot of the catchs in nets with all the species, quarters 1992-2012
+sildplotq<- gather(sildqp, key = species, value = catch, norwegian.herring, herring) 
+ggplot(data= sildplotq, aes( x= quarters,  y=catch, norwegian.herring, herring, color=species ))+
+  geom_line()
+  
+#Correlations
+#correlation using all the species
+corr<- select(sildqp, norwegian.herring, herring)
+cor(corr)
+# plot with the 3 species
+plot(corr)
+
+# test correlation for specific species
+cor.test(sildqp$norwegian.herring, sildqp$herring , method="pearson")
+
+#R script for sild by weeks
+# script for week especially for plot:
+#values from 1 to 365 days, divided for weeks in a year
+sild$week <- as.Date(cut(sild$date, breaks='week'))
+sildWp <- sild %>% group_by(year, week) %>% 
+  summarize( norwegian.herring = sum(norwegian.herring),
+             herring = sum(herring))
+
+#plot by week
+plotweek <- gather(sildWp, key = species, value = catch, norwegian.herring, herring)
+ggplot(data= plotweek, aes( x= week,  y=catch, norwegian.herring, herring, color=species ))+
+  geom_line() 
+
+#Correlation test
+cor.test(sildWp$herring, sildWp$norwegian.herring, method="pearson")
