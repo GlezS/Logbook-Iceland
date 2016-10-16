@@ -1,6 +1,6 @@
 ### Handf by quarters and weeks 1992-2012
 
-# Handf with all the catch species in the gear botnv.
+# with all the catch species in the gear Handf.
 handf<- translate.handf()
 handf<- select(hand, landing.day, landing.month, year, catfish,cod, saithe, haddock) #selection of variables for reduce the database
 handf <- filter(handf, year>=1992 & year<=2012) # filter of years 1992-2012 
