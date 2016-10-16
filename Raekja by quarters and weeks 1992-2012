@@ -1,0 +1,57 @@
+### Raekja by quarters and weeks 1992-2012
+
+#with all the catch species in the gear raekja.
+raekja<- translate.raekja()
+raekja<- select(raekja, landing.day, landing.month, year, greenland.halibut, redfish, shrimp, cod)
+raekja <- filter(raekja, year>=1992 & year<=2012) # filter of years 1992-2012 
+raekja <- arrange(raekja,  year, landing.month, landing.day) # arrange, reordered by day, month and year.
+
+#values for create the data by quartes 1992-2012,
+raekja <- unite(raekja, date, 
+              year, landing.month, landing.day, 
+              sep='-', remove=F)
+raekja$date <- as.Date(raekja$date)
+raekja$quarters <- as.Date(cut(raekja$date, breaks='quarters'))
+raekjaqp <- raekja%>% group_by(quarters) %>% 
+  summarize( greenland.halibut = sum(greenland.halibut),
+             redfish = sum(redfish),
+             shrimp = sum(shrimp),
+             cod = sum(cod))
+            
+# Plot of the catchs in nets with all the species, quarters 1992-2012
+raekjaplotq<- gather(raekjaqp, key = species, value = catch, greenland.halibut, redfish, shrimp,  cod) 
+ggplot(data= raekjaplotq, aes( x= quarters,  y=catch, greenland.halibut, redfish, shrimp,  cod, color=species ))+
+  geom_line()
+  
+#Correlations
+#correlation using all the species
+corr<- select(raekjaqp, greenland.halibut, redfish, shrimp, cod)
+cor(corr)
+# plot with the 3 species
+plot(corr)
+
+# test correlation for specific species
+cor.test(raekjaqp$cod, raekjaqp$shrimp , method="pearson")
+cor.test(raekjaqp$redfish, raekjaqp$shrimp , method="pearson")
+cor.test(raekjaqp$redfish, raekjaqp$cod , method="pearson")
+
+#R script for handf by weeks
+# script for week especially for plot:
+#values from 1 to 365 days, divided for weeks in a year
+raekja$week <- as.Date(cut(raekja$date, breaks='week'))
+raekjaWp <- raekja %>% group_by(year, week) %>% 
+   summarize( greenland.halibut = sum(greenland.halibut),
+             redfish = sum(redfish),
+             shrimp = sum(shrimp),
+             cod = sum(cod))
+
+#plot by week
+plotweek <- gather(raekjaWp, key = species, value = catch, greenland.halibut, redfish, shrimp, cod)
+ggplot(data= plotweek, aes( x= week,  y=catch, greenland.halibut, redfish, shrimp, cod, color=species ))+
+  geom_line() 
+
+
+#Correlation test
+cor.test(raekjaWp$cod, raekjaWp$shrimp , method="pearson")
+cor.test(raekjaWp$redfish, raekjaWp$shrimp , method="pearson")
+cor.test(raekjaWp$redfish, raekjaWp$cod , method="pearson")
