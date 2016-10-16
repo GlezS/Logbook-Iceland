@@ -1,6 +1,6 @@
 ### Dragnot by quarters and weeks 1992-2012
 
-# Dragnot with all the catch species in the gear botnv.
+# Dragnot with all the catch species in the gear.
 #values for create the data by quartes 1992-2012
 dragnot<- translate.dragnot()
 dragnot<- select(dragnot, landing.day, landing.month, year, gray.sole, halibut, whiting, common.dab, plaice, skates, monkfish, rough.dab, catfish, megrim, cod, lemon.sole, saithe, haddock)
@@ -75,18 +75,3 @@ cor.test(dragnotWp$catfish, dragnotWp$lemon.sole, method="pearson")
 cor.test(dragnotWp$haddock, dragnotWp$common.dab, method="pearson")
 cor.test(dragnotWp$haddock, dragnotWp$cod, method="pearson")
 
-
-# other way for look by week and year
-# for week, usig 53 weeks per year 
-dates <- as.POSIXlt(as.Date(dragnot$date))
-yday <- unclass(dates)$yday
-dragnot$yday <- yday
-dragnot<- mutate(dragnot, weeks = ceiling(yday / 7))
-dragnot$date <- as.Date(dragnot$yday)
-dragnot$week <- as.Date(cut(dragnot$yday, breaks='weeks'))
-dragnotW <- dragnot %>% group_by(year, weeks) %>% 
- summarize(common.dab = sum(common.dab),
-            catfish = sum(catfish),
-            cod = sum(cod),
-            lemon.sole = sum(lemon.sole),
-            haddock = sum(haddock))
