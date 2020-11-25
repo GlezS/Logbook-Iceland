@@ -1,4 +1,4 @@
-## **R commands for model fleet dynamics in Alantis**
+## **R commands for model fleet dynamics in Atlantis**
 
 The aim in this  R script is to review into logbook. Create a database by quarters and weeks in the catches period 1992-2012, using gears and the catching species with each of the main gears in Icelandic waters and figure out if the species are correlated with each other and how affect. If are correlated how affect the catch of one specie in other and if fishing vessels can capture a species without affecting the ecosystem. 
 ###Package and library
